@@ -167,12 +167,12 @@ public:
 
 		char* result_part[NUMBER_OF_PARTS];
 		char* conversion_string = (char*)malloc(7+1);
-		sprintf(conversion_string, "%%0%dllx", MAX_HEX_INPUT_SIZE_PER_PART);
+		sprintf(conversion_string, "%%0%dllx", MAX_HEX_INPUT_SIZE_PER_PART);	// this forms "%016llx" for hexadecimal
 		
 		for(int i = NUMBER_OF_PARTS - 1;   i >= 0 ;   --i)
 		{
             result_part[i] = (char*)calloc(MAX_HEX_INPUT_SIZE_PER_PART+1, sizeof(char));
-			sprintf(result_part[i], "%016llx", this->parts[i]);		// TODO: remove hardcoded for hexadecimal (create "16" at string "%016llx" from MAX_HEX_INPUT_SIZE_PER_PART)
+			sprintf(result_part[i], conversion_string, this->parts[i]);			// convert 64bit integer (a part) to string, presenting in hexadecimal filled with zeros for fixed size = 16
 			strcat(result, result_part[i]);
 		}
 		
