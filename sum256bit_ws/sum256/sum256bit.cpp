@@ -68,20 +68,33 @@ void validate_64_bit_vars()
 struct integer256
 {
 	uint64_t  parts[NUMBER_OF_PARTS];
+	bool overflow;
+    
+    integer256() :
+		overflow(false)
+    {
+        for(int i = 0;  i < NUMBER_OF_PARTS;  ++i)
+        {	 parts[i] = 0;	 }
+    }
 	
 	integer256 operator+(const integer256& b)
 	{
 		integer256 result;
 		uint64_t carrier = 0;
 		
-		for(int i = 0;  i < 4;  ++i)
+		for(int i = 0;  i < NUMBER_OF_PARTS;  ++i)
 		{
 			result.parts[i] = this->parts[i] + b.parts[i] + carrier;
-			if(b.parts[i] + carrier > UINTMAX_MAX - this->parts[i]) 	// Overflow
+			if(b.parts[i] > UINTMAX_MAX - carrier ||
+				b.parts[i] + carrier > UINTMAX_MAX - this->parts[i]) 	// Overflow case
 			{	carrier = 1;	}	// add +1 in the next sum
 			else
 			{	carrier = 0;	}
 		}
+		
+		if( carrier == 1 )	// Unhandlable Overflow
+		{	result.overflow = true;	}
+		
 		return result;
 	}
 	
@@ -91,13 +104,17 @@ struct integer256
 		const int MAX_HEX_INPUT_SIZE = NUMBER_OF_PARTS*MAX_HEX_INPUT_SIZE_PER_PART;
 		char* result = (char*)calloc(MAX_HEX_INPUT_SIZE+1, sizeof(char));
 
-		char* result_part[4];
+		char* result_part[NUMBER_OF_PARTS];
 		
-		for(int i = 0;  i < 4;  ++i)
+		for(int i = NUMBER_OF_PARTS - 1;   i >= 0 ;   --i)
 		{
-			sprintf(result_part[i], "%llx", this->parts[i]);
+            result_part[i] = (char*)calloc(MAX_HEX_INPUT_SIZE_PER_PART+1, sizeof(char));
+			sprintf(result_part[i], "%016llx", this->parts[i]);		// TODO: remove hardcoded for hexadecimal (create "16" at string "%016llx" from MAX_HEX_INPUT_SIZE_PER_PART)
 			strcat(result, result_part[i]);
 		}
+		
+		if( this->overflow == true )
+		{	strcat(result, " (overflown)");	}
 		
 		return result;
 	}
@@ -116,12 +133,13 @@ void tests()
 	//int64_t teste4 = 0;
 }
 
-int convert_string_to_256_bit_integer(integer256 full_dig1, char** argv, char* varc1, int base, size_t MAX_HEX_INPUT_SIZE_PER_PART)
+int convert_string_to_256_bit_integer(integer256& full_dig1, char** argv, char* varc1, unsigned int base, size_t MAX_HEX_INPUT_SIZE_PER_PART)
 {
 	size_t str1_size = strlen (varc1);
 	size_t i;
 	int c;
-	int dig;
+	uint64_t temp ;
+	uint64_t dig;
 	const unsigned char *digit_value;
 	digit_value = CHAR_TO_INT_GLOBAL;
 	
@@ -134,7 +152,8 @@ int convert_string_to_256_bit_integer(integer256 full_dig1, char** argv, char* v
 			c = (unsigned char) *varc1++;				// Read next digit
 			dig = digit_value[c];						// convert from string (that may represent eg. hexadecimal) to decimal
 			if( dig >= base ){help(argv); return -1;}	// (protect from invalid digits)
-			dig1 += dig * pow(base, i);					// add this decimal to our 64 bit integer (a part) with its proper importance
+			temp = dig * pow(base, i);		// this intermediate step avoids unkown +1 error that occured e.g. for base=16, i=14, dig=15 !!!!!
+			dig1 += temp;					// add this decimal to our 64 bit integer (a part) with its proper importance
 		}
 		str1_size = str1_size - i; 	// Reduce what was read from readed size
 		full_dig1.parts[j] = dig1;		// Add this part to our 256 bit integer
@@ -180,39 +199,6 @@ int main(int argc, char** argv)
 	integer256 full_dig2;
 	convert_string_to_256_bit_integer(full_dig2, argv, varc2, 16, MAX_HEX_INPUT_SIZE_PER_PART);
 	
-	/*size_t i;
-	int c;
-	int dig;
-	int base = 16;
-	const unsigned char *digit_value;
-	digit_value = CHAR_TO_INT_GLOBAL;
-	
-	integer256 full_dig1;
-	int j=0;
-	while( str1_size > 0 ) // check if there is still something to be read for the next integer part
-	{
-		uint64_t dig1 = 0;	
-		for( i = 0;  i < str1_size && i < MAX_HEX_INPUT_SIZE_PER_PART;  ++i )	// Go thru all inserted letters until the max allowed per part (just read one 64 bit part at a time)
-		{
-			c = (unsigned char) *varc1++;				// Read next digit
-			dig = digit_value[c];						// convert from string (that may represent eg. hexadecimal) to decimal
-			if( dig >= base ){help(argv); return -1;}	// (protect from invalid digits)
-			dig1 += dig * pow(base, i);					// add this decimal to our 64 bit integer (a part) with its proper importance
-		}
-		str1_size = str1_size - i; 	// Reduce what was read from readed size
-		full_dig1[j] = dig1;		// Add this part to our 256 bit integer
-		++j;
-	}
-	
-	integer256 full_dig2;
-	uint64_t dig2 = 0;
-	for (i = 0; i < str2_size; ++i)
-	{
-		c = (unsigned char) *varc2++;
-		dig = digit_value[c];
-		if( dig >= base ){help(argv); return -1;}
-		dig2 += dig * pow(base, i);
-	}*/
 
 	integer256  result = full_dig1 + full_dig2;
 	
