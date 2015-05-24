@@ -111,7 +111,7 @@ public:
 				
 				if(base == 16)
 				{	dig_temp |= dig << 4 * i;	}	// With this line All tests run in 0.8~0.9 secs (hexadecimal specific nevertheless)
-				else	// Generic alternative		- All tests run in 2.2~2.3 secs
+				else	// Generic alternative		- All tests run in 2.2~2.3 secs (both times were measured in a virtual machine with debug compilation. There are ~100k sum calculations)
 				{
 					temp = dig * pow(base, i);		// (this intermediate step avoids unkown +1 error that occured for base=16, i=14, dig=15 calcule added to dig_temp=0xFFFFFFFFFFFFFF !!!!!)
 					dig_temp += temp;				// add this decimal to our 64 bit integer (a part) with its proper importance
