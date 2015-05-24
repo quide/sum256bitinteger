@@ -219,6 +219,18 @@ TEST_FIXTURE(fixture, sum256_uppercase_and_sequence)
 	
 	CHECK_EQUAL("02468acf13579bde02468acf13579bde02468acf13579bde02468acf13579bde", result.print());
 }
+
+TEST_FIXTURE(fixture, sum256_run_lots_of_times)
+{
+	for(int i = 0;  i<100000;  ++i)
+	{
+		full_dig1.init_from_string("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", base);
+		full_dig2.init_from_string("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", base);
+		result = full_dig1 + full_dig2;
+	
+		CHECK_EQUAL("02468acf13579bde02468acf13579bde02468acf13579bde02468acf13579bde", result.print());
+	}
+}
   
  
 // run all tests

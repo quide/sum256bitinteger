@@ -93,9 +93,10 @@ public:
 		varc += (str_size - 1); // Go from the right to the left of the input string
 		
 		int j=0;
+		uint64_t dig_temp;
 		while( str_size > 0 ) // check if there is still something to be read for the next integer part
 		{
-			uint64_t dig_temp = 0;	
+			dig_temp = 0;	
 			for( i = 0;  i < str_size && i < MAX_HEX_INPUT_SIZE_PER_PART;  ++i )	// Go thru all inserted letters until the max allowed per part (just read one 64 bit part at a time)
 			{
 				c = (unsigned char) *varc--;				// Read next digit
@@ -105,10 +106,14 @@ public:
 					this->invalid = true;
 					return -1;	
 				}
-				temp = dig * pow(base, i);		// (this intermediate step avoids unkown +1 error that occured for base=16, i=14, dig=15 calcule added to dig_temp=0xFFFFFFFFFFFFFF !!!!!)
-				// TODO: measure time for faster alternative, something like: 
-				// dig_temp |= dig << i (hexadecimal specific nevertheless)
-				dig_temp += temp;					// add this decimal to our 64 bit integer (a part) with its proper importance
+				
+				if(base == 16)
+				{	dig_temp |= dig << 4 * i;	}	// With this line All tests run in 0.8~0.9 secs (hexadecimal specific nevertheless)
+				else	// Generic alternative		- All tests run in 2.2~2.3 secs
+				{
+					temp = dig * pow(base, i);		// (this intermediate step avoids unkown +1 error that occured for base=16, i=14, dig=15 calcule added to dig_temp=0xFFFFFFFFFFFFFF !!!!!)
+					dig_temp += temp;				// add this decimal to our 64 bit integer (a part) with its proper importance
+				}
 			}
 			str_size = str_size - i; 	// Reduce what was read from readed size
 			this->parts[j] = dig_temp;		// Add this part to our 256 bit integer

@@ -1,6 +1,3 @@
-// gcc -Wall -g sum256bit.cpp -lm -o sum256bit
-
-
 #include "integer256.h"
 
 void help(char** argv)
