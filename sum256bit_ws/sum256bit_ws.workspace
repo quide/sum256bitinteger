@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="sum256bit_ws" Database="">
+  <Project Name="sum256" Path="sum256/sum256.project" Active="No"/>
+  <Project Name="integer256" Path="integer256/integer256.project"/>
+  <Project Name="sum256tests" Path="sum256tests/sum256tests.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="sum256" ConfigName="Debug"/>
+      <Project Name="integer256" ConfigName="Debug"/>
+      <Project Name="sum256tests" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="sum256" ConfigName="Release"/>
+      <Project Name="integer256" ConfigName="Release"/>
+      <Project Name="sum256tests" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
