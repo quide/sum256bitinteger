@@ -52,6 +52,8 @@ const unsigned char CHAR_TO_INT_GLOBAL[] =
 #define NUMBER_OF_PARTS 4		// 4*64 bits = 256 bits
 #define MAX_BYTES_PER_PART 8 	// 64 bits = 8 bytes
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreorder"
 struct integer256
 {
 private:
@@ -191,6 +193,7 @@ public:
 		//static_assert(sizeof(teste)*8==64, "Compilador não suporta variáveis de 64 bits!");
 	}
 };
+#pragma GCC diagnostic pop
 
 }
 
