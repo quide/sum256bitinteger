@@ -92,11 +92,11 @@ public:
 		const unsigned char *digit_value;
 		digit_value = CHAR_TO_INT_GLOBAL;
 		
-		varc += (str_size - 1); // Go from the right to the left of the input string
+		varc += (str_size - 1);		// Go from the right to the left of the input string
 		
 		int j=0;
 		uint64_t dig_temp;
-		while( str_size > 0 ) // check if there is still something to be read for the next integer part
+		while( str_size > 0 )		// check if there is still something to be read for the next integer part
 		{
 			dig_temp = 0;	
 			for( i = 0;  i < str_size && i < MAX_HEX_INPUT_SIZE_PER_PART;  ++i )	// Go thru all inserted letters until the max allowed per part (just read one 64 bit part at a time)
@@ -111,13 +111,13 @@ public:
 				
 				if(base == 16)
 				{	dig_temp |= dig << 4 * i;	}	// With this line All tests run in 0.8~0.9 secs (hexadecimal specific nevertheless)
-				else	// Generic alternative		- All tests run in 2.2~2.3 secs (both times were measured in a virtual machine with debug compilation. There are ~100k sum calculations)
+				else			// Generic alternative - All tests run in 2.2~2.3 secs (both times were measured in a virtual machine with debug compilation. There are ~100k sum calculations)
 				{
 					temp = dig * pow(base, i);		// (this intermediate step avoids unkown +1 error that occured for base=16, i=14, dig=15 calcule added to dig_temp=0xFFFFFFFFFFFFFF !!!!!)
 					dig_temp += temp;				// add this decimal to our 64 bit integer (a part) with its proper importance
 				}
 			}
-			str_size = str_size - i; 	// Reduce what was read from readed size
+			str_size = str_size - i; 		// Reduce what was read from readed size
 			this->parts[j] = dig_temp;		// Add this part to our 256 bit integer
 			++j;
 		}
